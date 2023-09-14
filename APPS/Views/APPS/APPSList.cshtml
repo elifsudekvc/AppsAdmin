@@ -1,0 +1,139 @@
+﻿@model AppsServices.Models.AllModels
+
+@{
+    ViewData["Title"] = "home page";
+
+}
+
+<div class="text-center">
+    <div class="row">
+
+        <div class="col-lg-12" style="margin-top: 10px; margin-bottom: 10px" ;>
+            @{
+                if (TempData["SuccessMsg"] != null)
+                {
+                    <h3 style="background-color: pink;">@TempData["SuccessMsg"]</h3>
+                }
+            }
+            @{
+                if (TempData["ErrorMsg"] != null)
+                {
+                    <h3 style="background-color: red;">@TempData["ErrorMsg"]</h3>
+                }
+            }
+
+        </div>
+
+        <div class="col-lg-8 m-1" style="text-align: start;">
+            <form method="post" asp-area="" asp-controller="APPS" asp-action="InsertUpdateAPPSRecord">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label for="AppName">AppName</label>
+                    <input type="text" class="form-control" name=AppName id="AppName" placeholder="Enter App Name">
+                    <input type="hidden" id="AppID" name="AppID">
+                </div>
+                <div class="form-group">
+                    <label for="Ratings">Ratings</label>
+                    <input type="number" class="form-control" name=ratings id="Ratings" placeholder="Raitings">
+                </div>
+                <div class="form-group">
+                    <label for="info">info</label>
+                    <input type="text" class="form-control" name=info id="info" placeholder="Enter description">
+
+                </div>
+                <div class="form-group" style="margin-bottom: 10px" ;>
+                    <label for="Link">Link</label>
+                    <input type="text" class="form-control" name=Link id="Link" placeholder="Enter Link">
+                </div>
+
+                <button type="submit" class="btn btn-primary">ADD APP</button>
+                <br />
+                <br />
+            </form>
+
+        </div>
+
+        <div class="col-lg-12">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                <thead>
+                    <tr>
+                        <th scope="col">AppID</th>
+                        <th scope="col">AppName</th>
+                        <th scope="col">Ratings</th>
+                        <th scope="col">info</th>
+                        <th scope="col">Link</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        @{
+                            if (Model.APPSList != null && Model.APPSList.Count > 0)
+                            {
+                                foreach (var item in Model.APPSList)
+                                {
+                                <tr>
+                                    <td>@item.AppID</td>
+                                    <td>@item.AppName</td>
+                                    <td>@item.Ratings</td>
+                                    <td>@item.info</td>
+                                    <td>@item.Link</td>
+                                    <td>
+                                        <button class="btn btn-danger" style="width:100px" onclick="DeleteApp('@item.AppID')">Delete</button><br>
+                                        <button class="btn btn-info" style="width:100px" onclick="UpdateAPPSRecord('@item.AppID','@item.AppName','@item.Ratings','@item.info','@item.Link')">Update</button>
+                                    </td>
+                                </tr>
+                                }
+                            }
+                        }
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    function DeleteApp(AppID) {
+        let response = confirm("Do you realy want to delete this recod?");
+        if (response) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("DeleteAPPSRecord","APPS")',
+                data: { AppID: AppID },
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "json",
+
+                success: function (response) {
+
+                    if (response.message == 'DELETED') {
+                        window.location.reload();
+                    }
+                    else {
+                        alert(response.message)
+                    }
+                },
+                complete: function () {
+
+                },
+                failure: function (jqXHR, textStatus, errorThrown) {
+                    alert("error. please try again.");
+                }
+            });
+        }
+    }
+
+    function UpdateAPPSRecord(AppID, AppName, Ratings, info, Link) {
+
+        $('#AppID').val(AppID);
+        $('#AppName').val(AppName);
+        $('#Ratings').val(Ratings);
+        $('#info').val(info);
+        $('#Link').val(Link);
+
+    }
+
+</script>
+
